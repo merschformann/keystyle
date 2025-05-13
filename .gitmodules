@@ -1,0 +1,3 @@
+[submodule "golangci-lint"]
+	path = golangci-lint
+	url = https://github.com/golangci/golangci-lint.git

@@ -1,2 +1,9 @@
-# camelKey
-Plugin linter camelKey for golangci lint.
+# keyStyle
+
+Map-key styling linter plugin for golangci lint.
+
+## Setup
+
+```bash
+bash setup.sh
+```

@@ -1,0 +1,22 @@
+version: "2"
+
+linters:
+  default: none
+  enable:
+    - keystyle
+
+  settings:
+    custom:
+      keystyle:
+        # Path is required
+        path: dist/keystyle.so
+        # Description is optional
+        description: Map-key styling linter. Makes sure that all keys in certain maps are styled the same way.
+        # Original-url is optional, and is only used for documentation purposes.
+        original-url: github.com/merschformann/keyStyle
+        settings:
+          one: Foo
+          three:
+            name: Bar
+          two:
+            - name: Bar
