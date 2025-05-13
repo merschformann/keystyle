@@ -2,8 +2,9 @@
 
 Map-key styling linter plugin for golangci lint.
 
-## Setup
+## Setup and build
 
 ```bash
-bash setup.sh
+bash scripts/setup.sh
+bash scripts/build.sh
 ```
