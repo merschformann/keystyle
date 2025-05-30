@@ -5,13 +5,21 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/merschformann/keystyle/analyzer"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/tools/go/analysis/analysistest"
 )
 
 func TestTodoAnalyzer(t *testing.T) {
-	analysistest.Run(t, testdataDir(t), analyzer.KeyStyleAnalyzer, "testlintdata/keystyle")
+	linter, err := New(map[string]any{
+		"style": "camelCase", // Example style, can be changed to "PascalCase", "kebab-case", etc.
+	})
+	require.NoError(t, err)
+	analyzers, err := linter.BuildAnalyzers()
+	require.NoError(t, err)
+	if len(analyzers) != 1 {
+		require.Fail(t, "expected exactly one analyzer, got %d", len(analyzers))
+	}
+	analysistest.Run(t, testdataDir(t), analyzers[0], "testlintdata/keystyle")
 }
 
 func testdataDir(t *testing.T) string {

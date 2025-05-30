@@ -1,4 +1,4 @@
-package analyzer
+package linters
 
 import (
 	"fmt"
@@ -7,13 +7,49 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/golangci/plugin-module-register/register"
 	"golang.org/x/tools/go/analysis"
 )
 
-var KeyStyleAnalyzer = &analysis.Analyzer{
-	Name: "keystyle",
-	Doc:  "Check the style of keys in maps.",
-	Run:  run,
+func init() {
+	register.Plugin("keystyle", New)
+}
+
+type KeyStyleSettings struct {
+	Style KeyStyle `json:"style"` // The style of keys in maps, e.g., "camelCase", "PascalCase", "kebab-case", "snake_case".
+}
+
+type PluginKeyStyle struct {
+	settings KeyStyleSettings
+}
+
+func New(settings any) (register.LinterPlugin, error) {
+	// The configuration type will be map[string]any or []interface, it depends on your configuration.
+	// You can use https://github.com/go-viper/mapstructure to convert map to struct.
+
+	s, err := register.DecodeSettings[KeyStyleSettings](settings)
+	if err != nil {
+		return nil, err
+	}
+
+	return &PluginKeyStyle{settings: s}, nil
+}
+
+func (f *PluginKeyStyle) BuildAnalyzers() ([]*analysis.Analyzer, error) {
+	return []*analysis.Analyzer{
+		{
+			Name: "keystyle",
+			Doc:  "Checks the style of keys in maps.",
+			Run:  f.run,
+		},
+	}, nil
+}
+
+func (f *PluginKeyStyle) GetLoadMode() string {
+	// NOTE: the mode can be `register.LoadModeSyntax` or `register.LoadModeTypesInfo`.
+	// - `register.LoadModeSyntax`: if the linter doesn't use types information.
+	// - `register.LoadModeTypesInfo`: if the linter uses types information.
+	return register.LoadModeSyntax
 }
 
 // KeyStyle defines the style of keys in maps.
@@ -35,11 +71,9 @@ func checkStyle(s string, style *regexp.Regexp) bool {
 	return style.MatchString(s)
 }
 
-func run(pass *analysis.Pass) (interface{}, error) {
-	// TODO: get the configuration.
-	style := CamelCase // This should be replaced with actual configuration retrieval logic
+func (f *PluginKeyStyle) run(pass *analysis.Pass) (interface{}, error) {
 	var styleRegex *regexp.Regexp
-	switch style {
+	switch f.settings.Style {
 	case CamelCase:
 		styleRegex = camelCaseRegex
 	case PascalCase:
@@ -49,7 +83,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	case SnakeCase:
 		styleRegex = snakeCaseRegex
 	default:
-		return nil, fmt.Errorf("unknown style: %s", style)
+		return nil, fmt.Errorf("unknown style: %s", f.settings.Style)
 	}
 
 	for _, file := range pass.Files {
