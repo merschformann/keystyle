@@ -6,7 +6,7 @@ type LogData map[string]any
 // TODO: ajsdlasj
 func SomeFunc1() {
 	data := LogData{
-		"key1":            "value1",
+		"keyCamel1":       "value1",
 		"incorrect_key_1": "value2",
 	}
 	_ = data["key1"]

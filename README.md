@@ -6,7 +6,7 @@ Map-key styling linter plugin for golangci lint.
 
 Instructions for setting up a custom linter can be found in the [golangci-lint documentation](https://golangci-lint.run/plugins/module-plugins/). Replace `foo` with `keyStyle` in the example (and the paths accordingly).
 
-Configuration:
+Configuration (`.golangci.yml`):
 
 ```yaml
 linters:
@@ -19,7 +19,12 @@ linters:
         type: "module"
         description: Keystyle preference.
         settings:
-          style: "camelCase"
+          checks:
+            - style: "camelCase"
+              type-name: "LogData"
+            - style: "custom"
+              type-name: "OtherData"
+              regex: "^[a-z][a-zA-Z0-9]*$"
 ```
 
 ## Setup and build

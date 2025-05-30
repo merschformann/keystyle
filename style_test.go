@@ -11,7 +11,13 @@ import (
 
 func TestTodoAnalyzer(t *testing.T) {
 	linter, err := New(map[string]any{
-		"style": "camelCase", // Example style, can be changed to "PascalCase", "kebab-case", etc.
+		"checks": []map[string]any{
+			{
+				"style":     "camelCase", // Example style, can be changed to "PascalCase", "kebab-case", etc.
+				"type-name": "LogData",   // Example type name to check.
+				"regex":     "",          // Optional regex for custom key matching.
+			},
+		},
 	})
 	require.NoError(t, err)
 	analyzers, err := linter.BuildAnalyzers()
