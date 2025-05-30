@@ -38,7 +38,7 @@ plugins:
   # Import keystyle linter for linting of map key style.
   - module: 'github.com/merschformann/keystyle'
     import: 'github.com/merschformann/keystyle'
-    version: v1.0.0
+    version: v0.0.1
 ```
 
 Linter configuration (`.golangci.yml`):
