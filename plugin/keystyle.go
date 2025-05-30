@@ -4,7 +4,7 @@ package main
 import (
 	"fmt"
 
-	linters "github.com/golangci/example-linter"
+	"github.com/merschformann/keystyle/analyzer"
 	"github.com/mitchellh/mapstructure"
 	"golang.org/x/tools/go/analysis"
 )
@@ -42,5 +42,5 @@ func New(conf any) ([]*analysis.Analyzer, error) {
 	// The configuration type will be map[string]any or []interface, it depends on your configuration.
 	// You can use https://github.com/go-viper/mapstructure to convert map to struct.
 
-	return []*analysis.Analyzer{linters.KeyStyleAnalyzer}, nil
+	return []*analysis.Analyzer{analyzer.KeyStyleAnalyzer}, nil
 }

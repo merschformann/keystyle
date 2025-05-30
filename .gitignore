@@ -27,3 +27,4 @@ go.work.sum
 # Build files
 keystyle.so
 dist/
+cmd/keystyle/keystyle

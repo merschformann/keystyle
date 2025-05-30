@@ -5,12 +5,13 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/merschformann/keystyle/analyzer"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/tools/go/analysis/analysistest"
 )
 
 func TestTodoAnalyzer(t *testing.T) {
-	analysistest.Run(t, testdataDir(t), KeyStyleAnalyzer, "testlintdata/keystyle")
+	analysistest.Run(t, testdataDir(t), analyzer.KeyStyleAnalyzer, "testlintdata/keystyle")
 }
 
 func testdataDir(t *testing.T) string {

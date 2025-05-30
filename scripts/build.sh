@@ -16,4 +16,4 @@ cd ..
 # Copy binaries to dist directory
 mkdir -p dist
 mv -v golangci-lint/golangci-lint dist/
-mv -v keystyle.so dist/
+# mv -v keystyle.so dist/ # TODO: check gotz for a working (but bad) version
