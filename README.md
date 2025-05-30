@@ -26,9 +26,9 @@ example.go:10:3: Key 'IncorrectKey2' style should be camelCase (keystyle)
 
 ## Usage
 
-Instructions for setting up a custom linter can be found in the [golangci-lint documentation](https://golangci-lint.run/plugins/module-plugins/). Replace `foo` with `keyStyle` in the example (and the paths accordingly).
+> Instructions for setting up a custom linter can be found in the [golangci-lint documentation](https://golangci-lint.run/plugins/module-plugins/). Replace `foo` with `keyStyle` in the example (and the paths accordingly).
 
-These instructions are based on above documentation.
+The following instructions are based on above documentation.
 
 Linter plugin setup (`.custom-gcl.yml`):
 
