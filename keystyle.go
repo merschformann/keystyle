@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/golangci/plugin-module-register/register"
@@ -16,7 +17,8 @@ func init() {
 }
 
 type KeyStyleSettings struct {
-	Style KeyStyle `json:"style"` // The style of keys in maps, e.g., "camelCase", "PascalCase", "kebab-case", "snake_case".
+	Style     KeyStyle `json:"style"` // The style of keys in maps, e.g., "camelCase", "PascalCase", "kebab-case", "snake_case".
+	TypeNames []string `json:"types"` // The names of the types of maps to check, e.g., "LogData"
 }
 
 type PluginKeyStyle struct {
@@ -90,22 +92,24 @@ func (f *PluginKeyStyle) run(pass *analysis.Pass) (interface{}, error) {
 		ast.Inspect(file, func(n ast.Node) bool {
 			// Check for composite literals
 			if cl, ok := n.(*ast.CompositeLit); ok {
-				// Check if the composite literal is of type LogData or *LogData or logger.LogData
-				var isLogData bool
+				// Check if the composite literal is of type CustomType or *CustomType or logger.CustomType
+				var isCustomType bool
 				switch t := cl.Type.(type) {
 				case *ast.Ident:
-					isLogData = t.Name == "LogData"
+					isCustomType = slices.Contains(f.settings.TypeNames, t.Name)
 				case *ast.StarExpr:
 					if ident, ok := t.X.(*ast.Ident); ok {
-						isLogData = ident.Name == "LogData"
+						isCustomType = slices.Contains(f.settings.TypeNames, ident.Name)
 					} else if sel, ok := t.X.(*ast.SelectorExpr); ok {
-						isLogData = sel.Sel.Name == "LogData"
+						isCustomType = slices.Contains(f.settings.TypeNames, sel.Sel.Name)
 					}
 				case *ast.SelectorExpr:
-					isLogData = t.Sel.Name == "LogData"
+					isCustomType = slices.Contains(f.settings.TypeNames, t.Sel.Name)
+				default:
+					isCustomType = false
 				}
 
-				if isLogData {
+				if isCustomType {
 					// Check each key in the composite literal
 					for _, elt := range cl.Elts {
 						if kv, ok := elt.(*ast.KeyValueExpr); ok {
