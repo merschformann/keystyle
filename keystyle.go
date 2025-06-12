@@ -69,7 +69,7 @@ const (
 	Custom     KeyStyle = "custom" // Custom style with a regex pattern.
 )
 
-var camelCaseRegex = regexp.MustCompile("^[a-z]+([A-Z][a-z]*[0-9]*)*$")
+var camelCaseRegex = regexp.MustCompile("^[a-z]+[0-9]*([A-Z][a-z]*[0-9]*)*$")
 var pascalCaseRegex = regexp.MustCompile("^([A-Z][a-z0-9]+)+$")
 var kebabCaseRegex = regexp.MustCompile("^[a-z]+(-[a-z0-9]+)*$")
 var snakeCaseRegex = regexp.MustCompile("^[a-z]+(_[a-z0-9]+)*$")
