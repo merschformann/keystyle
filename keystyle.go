@@ -3,6 +3,7 @@ package linters
 import (
 	"fmt"
 	"go/ast"
+	"go/constant"
 	"go/token"
 	"regexp"
 	"strings"
@@ -55,7 +56,7 @@ func (f *PluginKeyStyle) GetLoadMode() string {
 	// NOTE: the mode can be `register.LoadModeSyntax` or `register.LoadModeTypesInfo`.
 	// - `register.LoadModeSyntax`: if the linter doesn't use types information.
 	// - `register.LoadModeTypesInfo`: if the linter uses types information.
-	return register.LoadModeSyntax
+	return register.LoadModeTypesInfo
 }
 
 // KeyStyle defines the style of keys in maps.
@@ -130,25 +131,27 @@ func (f *PluginKeyStyle) run(pass *analysis.Pass) (interface{}, error) {
 						for _, elt := range cl.Elts {
 							if kv, ok := elt.(*ast.KeyValueExpr); ok {
 								if keyIdent, ok := kv.Key.(*ast.Ident); ok {
-									if !checkStyle(keyIdent.Name, styleRegex) {
-										pass.Report(analysis.Diagnostic{
-											Pos:            keyIdent.Pos(),
-											End:            0,
-											Category:       "keystyle",
-											Message:        fmt.Sprintf("Key '%s' style should be camelCase", keyIdent.Name),
-											SuggestedFixes: nil,
-										})
-										return false // Stop inspecting this node
+									// If the identifier resolves to a constant string, check its value.
+									// Otherwise skip: we can't statically know the key at compile time.
+									if tv, ok := pass.TypesInfo.Types[keyIdent]; ok && tv.Value != nil && tv.Value.Kind() == constant.String {
+										key := constant.StringVal(tv.Value)
+										if !checkStyle(key, styleRegex) {
+											pass.Report(analysis.Diagnostic{
+												Pos:      keyIdent.Pos(),
+												Category: "keystyle",
+												Message:  fmt.Sprintf("Key '%s' (from identifier '%s') style should be %s", key, keyIdent.Name, styleCheck.Style),
+											})
+											return false
+										}
 									}
+									// Non-constant identifier: skip — value is not known statically.
 								} else if keyBasicLit, ok := kv.Key.(*ast.BasicLit); ok && keyBasicLit.Kind == token.STRING {
 									key := strings.Trim(keyBasicLit.Value, `"`)
 									if !checkStyle(key, styleRegex) {
 										pass.Report(analysis.Diagnostic{
-											Pos:            keyBasicLit.Pos(),
-											End:            0,
-											Category:       "keystyle",
-											Message:        fmt.Sprintf("Key '%s' style should be camelCase", key),
-											SuggestedFixes: nil,
+											Pos:      keyBasicLit.Pos(),
+											Category: "keystyle",
+											Message:  fmt.Sprintf("Key '%s' style should be %s", key, styleCheck.Style),
 										})
 										return false // Stop inspecting this node
 									}
