@@ -1,12 +1,12 @@
-name: build
+name: unit tests
 on:
   push:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
-  build:
-    name: build
+  test:
+    name: test
     runs-on: ubuntu-latest
     steps:
       - name: git clone
